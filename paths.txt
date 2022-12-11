@@ -1,1 +1,0 @@
-Elden Ring = $HOME\AppData\Roaming\Elden Ring
