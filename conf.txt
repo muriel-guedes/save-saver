@@ -1,1 +1,0 @@
-repo_url = https://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@github.com/muriel-guedes/game-saves.git
