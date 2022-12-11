@@ -1,5 +1,10 @@
+use std::io::prelude::*;
+use std::iter::Iterator;
+use walkdir::WalkDir;
+use zip::write::FileOptions;
+
 use std::{path::{Path, PathBuf}, process::Command, env::set_current_dir, ffi::OsStr, sync::{mpsc::{Receiver, Sender, channel}},
-    io::Write};
+    io::Write, fs::File};
 
 const PATH: &'static str = "./conf.txt";
 
@@ -72,7 +77,7 @@ impl Backup {
                 Span::raw("Repo URL: "),
                 Span::from(repo_url.clone())
             ]),
-            Spans::from("Press \"Enter\" to backup all your data, or \"R\" to restore."),
+            Spans::from("Press \"Enter\" to backup all your data, \"T\" to compress all data, or \"R\" to restore."),
         ]), Layout::default()
             .margin(2)
             .constraints([Constraint::Min(1)])
@@ -218,6 +223,40 @@ impl Backup {
             send(&tx, "#Finished, press \"Enter\" to continue.");
             tx.send(None).unwrap();
         });
+    }
+    pub fn compress(&self, paths: Vec<BackupPath>) {
+        println!("");
+
+        let file = File::create(&"saves.zip").unwrap();
+        let mut zip = zip::ZipWriter::new(file);
+        let options = FileOptions::default()
+            .compression_method(zip::CompressionMethod::Zstd)
+            .compression_level(Some(22))
+            .unix_permissions(0o755);
+
+        for path in paths {
+            if path.absolute_path.exists() {
+                let path = path.absolute_path;
+                let mut buffer = Vec::new();
+                for entry in WalkDir::new(path) {
+                    let entry = entry.unwrap();
+                    let path = entry.path();
+                    if path.is_file() {
+                        println!("adding file {:?}", path);
+                        zip.start_file(path.to_string_lossy(), options).unwrap();
+                        let mut f = File::open(path).unwrap();
+                        f.read_to_end(&mut buffer).unwrap();
+                        zip.write_all(&*buffer).unwrap();
+                        buffer.clear();
+                    }
+                }
+            }else {
+                eprintln!("\"{}\" not found", path.absolute_path.display());
+            }
+        }
+
+        zip.finish().unwrap();
+        println!("Finished.");
     }
 }
 

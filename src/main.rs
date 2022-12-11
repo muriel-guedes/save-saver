@@ -80,6 +80,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     } else {
                         app.backup.backup(app.paths.paths.clone())
                     },
+                    KeyCode::Char('t') => app.backup.compress(app.paths.paths.clone()),
                     _ => {}
                 }
             },
