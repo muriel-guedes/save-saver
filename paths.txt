@@ -1,0 +1,5 @@
+Elden Ring = $HOME\AppData\Roaming\EldenRing
+A Plague Tale - Innocence = C:\Users\Public\Documents\Steam\CODEX\752590
+A Plague Tale - Requiem = C:\Users\Public\Documents\Steam\CODEX\1182900
+Medieval Dynasty = C:\Users\muriel\AppData\Local\Medieval_Dynasty\Saved\SaveGames
+The Legend of Zelda - BOTW = C:\Games\The Legend of Zelda - Breath of the Wild\mlc01\usr\save

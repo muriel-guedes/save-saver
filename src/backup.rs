@@ -144,22 +144,22 @@ impl Backup {
             let readme_content = std::fs::read_to_string("README.md").unwrap_or_default();
             let readme_content_lines: Vec<&str> = readme_content.lines().collect();
             let mut readme = std::fs::OpenOptions::new()
-                .truncate(true)
+                .truncate(false)
                 .create(true)
                 .write(true)
-                .append(false)
+                .append(true)
                 .open("README.md").unwrap();
             for readme_content_line in &readme_content_lines {
                 writeln!(readme, "{}", readme_content_line).unwrap();
             }
-            'a: for path in &paths {
+            'p: for path in &paths {
                 let line = format!("{} = {}<br>", path.name, path.relative_path.display());
                 for readme_content_line in &readme_content_lines {
                     if **readme_content_line == *line.as_str() {
-                        continue 'a
+                        continue 'p
                     }
                 }
-                write!(readme, "{line}").unwrap();
+                writeln!(readme, "{line}").unwrap();
             }
             run_command(&tx, "git", ["add", "."]);
             run_command(&tx, "git", ["commit", "-m", &format!("\"{}\"", Utc::now())]);
